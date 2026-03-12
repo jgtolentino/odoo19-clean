@@ -46,3 +46,6 @@ logs/
 # Odoo
 /filestore/
 /sessions/
+
+# MCP local overrides (machine-specific secrets/paths — never commit)
+.mcp.local.json

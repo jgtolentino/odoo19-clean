@@ -41,7 +41,13 @@ echo "Detecting available modules in the runtime image..."
 
 ADDONS_PATH="/usr/lib/python3/dist-packages/odoo/addons"
 
-AVAILABLE_MODULES=$(docker compose exec -T odoo bash -c "ls '${ADDONS_PATH}'" 2>/dev/null || true)
+if ! docker compose exec -T odoo test -d "${ADDONS_PATH}" 2>/dev/null; then
+  echo "ERROR: addons path '${ADDONS_PATH}' not found in the container." >&2
+  echo "       Is the container fully started? Try 'bash scripts/up.sh' and wait." >&2
+  exit 1
+fi
+
+AVAILABLE_MODULES=$(docker compose exec -T odoo bash -c "ls '${ADDONS_PATH}'")
 
 is_available() {
   echo "${AVAILABLE_MODULES}" | grep -qx "$1"
@@ -114,8 +120,13 @@ set -e
 if [ ${EXIT_CODE} -ne 0 ]; then
   echo ""
   echo "ERROR: Odoo exited with code ${EXIT_CODE} while initialising '${DEMO_DB_NAME}'." >&2
-  echo "If the database already exists and is non-empty, drop it first:" >&2
-  echo "  docker compose exec db psql -U odoo -c \"DROP DATABASE ${DEMO_DB_NAME};\"" >&2
+  echo "Possible causes:" >&2
+  echo "  - The database already exists and is non-empty. Drop it first:" >&2
+  echo "      docker compose exec db psql -U odoo -c \"DROP DATABASE ${DEMO_DB_NAME};\"" >&2
+  echo "  - A module in the install list has unresolved dependencies or conflicts." >&2
+  echo "  - A network or permission error prevented the init from completing." >&2
+  echo "Check the Odoo container logs for details:" >&2
+  echo "      docker compose logs odoo" >&2
   exit "${EXIT_CODE}"
 fi
 

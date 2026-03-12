@@ -8,6 +8,19 @@ All future addon layering (OCA modules, IPAI integrations, custom apps) must be 
 
 ---
 
+## Canonical database model
+
+| Database | Role | Demo data | Addon scope |
+|---|---|---|---|
+| `odoo_dev` | Clean control development DB | ❌ disabled | `base` only |
+| `odoo_dev_demo` | Auxiliary showroom/demo DB | ✅ enabled | Broad available core apps |
+| `odoo_staging` | Staging rehearsal DB | ❌ | Mirrors production |
+| `odoo` | Production DB | ❌ | Production-only |
+
+`odoo_dev_demo` is an auxiliary database under **development**, not a fourth canonical environment. It exists for product exploration and UX/Copilot testing only.
+
+---
+
 ## Phase 0 rules
 
 | Rule | Detail |
@@ -17,6 +30,8 @@ All future addon layering (OCA modules, IPAI integrations, custom apps) must be 
 | No extra addons | `addons_path` points only to core Odoo |
 | No devcontainer mixing | No `.devcontainer/`, no Codespaces config |
 | No runtime mixing | One Dockerfile, one compose file, no overrides |
+| `odoo_dev` stays clean | Only `base`, no demo data — the control specimen |
+| `odoo_dev_demo` is allowed | Demo data + broad core apps — showroom only |
 
 ---
 
@@ -27,7 +42,9 @@ All future addon layering (OCA modules, IPAI integrations, custom apps) must be 
 | Stack starts | `docker compose ps` shows both `db` and `odoo` running |
 | Health endpoint responds | `curl -sf http://localhost:8069/web/health` returns `{"status":"pass"}` |
 | Login page loads | `http://localhost:8069/web/login` returns HTTP 200 |
-| DB initialises cleanly | `bash scripts/init_db.sh` exits 0 without errors |
+| `odoo_dev` initialises cleanly | `bash scripts/init_db.sh` exits 0 — `base` only, no demo data |
+| `odoo_dev_demo` initialises | `bash scripts/init_demo_db.sh` exits 0 — demo data, broad core apps |
+| DBs remain separate | `odoo_dev` and `odoo_dev_demo` are independent databases |
 | CRM (future) | After installing `crm` + dependencies, CRM menu loads (phase 1+) |
 
 ---
@@ -37,3 +54,4 @@ All future addon layering (OCA modules, IPAI integrations, custom apps) must be 
 - **Phase 1:** Minimal safe OCA baseline (e.g. `server-tools`)  
 - **Phase 2:** IPAI addon layer  
 - Each phase gets its own branch and its own set of acceptance criteria.
+

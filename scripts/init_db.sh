@@ -7,17 +7,19 @@ if ! docker compose ps --services --filter "status=running" | grep -q "^odoo$"; 
   exit 1
 fi
 
-echo "Initialising database 'odoo_dev_clean' with module 'base' (demo data disabled)..."
+DEV_DB_NAME=odoo_dev
+
+echo "Initialising database '${DEV_DB_NAME}' with module 'base' (demo data disabled)..."
 
 docker compose exec odoo odoo \
   --db_host db \
   --db_port 5432 \
   --db_user odoo \
   --db_password odoo \
-  --database odoo_dev_clean \
+  --database "${DEV_DB_NAME}" \
   --init base \
   --without-demo=all \
   --stop-after-init
 
-echo "Database 'odoo_dev_clean' initialised successfully."
+echo "Database '${DEV_DB_NAME}' initialised successfully."
 echo "Open http://localhost:8069/web/login to continue."

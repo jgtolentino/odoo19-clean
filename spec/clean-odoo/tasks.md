@@ -26,5 +26,6 @@
 
 - [ ] All acceptance criteria in `docs/BASELINE.md` met
 - [ ] No custom addons, OCA paths, or IPAI references present
+- [ ] No MCP config (`.mcp.json`) or MCP docs present
 - [ ] Repo is PR-ready and reviewable
 

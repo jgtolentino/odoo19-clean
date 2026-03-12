@@ -78,3 +78,12 @@ bash scripts/down.sh
 - Docker ≥ 24
 - Docker Compose plugin (bundled with Docker Desktop / modern Docker Engine)
 
+## What comes next
+
+Only after both databases are locally validated:
+
+1. **Phase 1** — add `queue_job` and `auditlog` (OCA); nothing else until stable
+2. **Phase 2** — IPAI addon layer
+
+This repo remains a control specimen. No addon drift until Phase 1 is explicitly started on its own branch.
+

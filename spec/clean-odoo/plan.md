@@ -26,18 +26,25 @@
 
 ## Phase 1 — Minimal safe OCA baseline (future branch)
 
-- Add a curated, pinned set of OCA `server-tools` modules.
-- Extend `addons_path` to include OCA paths.
+First additions after Phase 0 local validation passes:
+
+1. `queue_job` (OCA `queue`) — async job queue
+2. `auditlog` (OCA `server-tools`) — field-level audit log
+
+No other modules until these are proven stable.
+
+- Extend `addons_path` to include the OCA source path.
+- Pin both modules to a specific OCA release tag.
 - Re-validate all Phase 0 acceptance criteria still pass.
 
-**Exit criteria:** OCA modules install without error; baseline tests still green.
+**Exit criteria:** `queue_job` and `auditlog` install without error; `/web/health` still responds; `odoo_dev` still passes all Phase 0 checks.
 
 ---
 
 ## Phase 2 — IPAI addon layer (future branch)
 
 - Layer IPAI-specific addons on top of the Phase 1 baseline.
-- Maintain backwards compatibility with Phase 0 DB schema where possible.
+- Maintain backwards compatibility with Phase 0/1 DB schema where possible.
 
 **Exit criteria:** IPAI features functional; no regressions in Phase 0/1 checks.
 

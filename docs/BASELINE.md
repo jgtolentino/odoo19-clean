@@ -51,7 +51,16 @@ All future addon layering (OCA modules, IPAI integrations, custom apps) must be 
 
 ## What comes next
 
-- **Phase 1:** Minimal safe OCA baseline (e.g. `server-tools`)  
-- **Phase 2:** IPAI addon layer  
+**Only after local validation of both databases passes** should Phase 1 begin.
+
+- **Phase 1 (first additions):** `queue_job` + `auditlog` — and nothing else until those are stable.
+- **Phase 2:** IPAI addon layer on top of the Phase 1 baseline.
 - Each phase gets its own branch and its own set of acceptance criteria.
+
+> The baseline merge is successful only when:
+> 1. `odoo_dev` is base-only and clean
+> 2. `odoo_dev_demo` is separate and demo-rich
+> 3. runtime stays core-only
+> 4. repo remains minimal
+> 5. no MCP / OCA / IPAI creep remains
 

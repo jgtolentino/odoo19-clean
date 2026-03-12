@@ -27,10 +27,7 @@ spec/clean-odoo/          # Constitution, PRD, plan, tasks
 ## Quickstart
 
 ```bash
-# 0. Copy the example env file (adjust passwords if needed)
-cp .env.example .env
-
-# 1. Start the stack
+# 1. Start the stack (credentials are pre-configured for phase 0 — no .env needed)
 bash scripts/up.sh
 
 # 2. Wait ~30 s for the database to be ready, then initialise the DB

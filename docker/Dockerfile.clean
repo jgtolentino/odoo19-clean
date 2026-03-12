@@ -1,0 +1,5 @@
+FROM odoo:19
+
+# Copy clean baseline configuration only.
+# No custom addons, no manifests, no OCA paths.
+COPY config/clean/odoo.conf /etc/odoo/odoo.conf

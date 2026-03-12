@@ -1,0 +1,3 @@
+# Python dependencies for Odoo.sh alignment.
+# Odoo.sh installs extra Python packages from requirements.txt at the branch root.
+# Phase 0: no extra dependencies required — this file is a placeholder.

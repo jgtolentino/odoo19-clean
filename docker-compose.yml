@@ -7,6 +7,11 @@ services:
       POSTGRES_DB: postgres
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U odoo"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     restart: unless-stopped
 
   odoo:
@@ -14,11 +19,15 @@ services:
       context: .
       dockerfile: docker/Dockerfile.clean
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     ports:
       - "8069:8069"
     volumes:
-      - odoo-web-data:/var/lib/odoo
+      # odoo-data mirrors Odoo.sh's /home/odoo/data: filestore + sessions
+      - odoo-data:/var/lib/odoo
+      # odoo-logs mirrors Odoo.sh's /home/odoo/logs: inspectable, disposable
+      - odoo-logs:/var/log/odoo
     environment:
       HOST: db
       PORT: 5432
@@ -28,4 +37,5 @@ services:
 
 volumes:
   pgdata:
-  odoo-web-data:
+  odoo-data:
+  odoo-logs:

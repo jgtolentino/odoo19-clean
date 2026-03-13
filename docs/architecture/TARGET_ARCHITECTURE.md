@@ -205,6 +205,28 @@ This repo evolves strictly in phases. Each phase is a separate branch.
 |---|---|---|
 | GitHub Actions CI | ✅ active | Boundary enforcement |
 | Dependabot | Deferred | Add when org policy is set |
-| Slack notifications | ❌ not here | Belongs on active delivery repos |
-| CodeSpaces | Tooling only | Not for redefining runtime contract |
+| Slack notifications | ❌ not here | Belongs on active delivery repos (`insightpulseai/odoo`, `insightpulseai/lakehouse`, etc.) |
+| CodeSpaces | Tooling only | Baseline validation, docs/spec edits, script work — not for redefining runtime contract |
 | Any third-party app | ❌ | This is a frozen baseline repo |
+
+---
+
+## Locked end state
+
+After all hardening steps in `docs/HARDENING.md` are applied, this repo is:
+
+- **Frozen clean-room baseline** — Phase 0 only on `main`
+- **Protected reference repo** — no direct pushes, no force pushes
+- **No feature growth beyond baseline maintenance**
+- **No Databricks / Genie / platform / custom business scope**
+
+### Next repo
+
+Do **not** extend `odoo19-clean` further.
+
+The next real build-out belongs in **`insightpulseai/odoo`** (Azure DevOps),
+with `odoo19-clean` used only as the reference baseline.
+
+Phase 1 (`queue_job` + `auditlog`) and Phase 2 (IPAI addons) each get their
+own branches in this repo — but only after Phase 0 local validation passes,
+and only via PR with all four required checks green.

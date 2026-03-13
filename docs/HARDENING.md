@@ -93,6 +93,11 @@ db-name-check
 required-files
 ```
 
+**CodeQL / code scanning:** If GitHub code scanning is consistently present on
+`main` (i.e. a CodeQL workflow has run at least once), add it as a required
+check too. If it is not yet stable on this repo, leave it non-required for now.
+Do not block the baseline merge waiting for CodeQL.
+
 **Note:** GitHub only allows selecting a check as "required" after it has
 completed successfully at least once in the repository. Run PR #4 first,
 then add the checks.
@@ -147,6 +152,40 @@ separate Phase 1 branch, after all Phase 0 acceptance criteria pass locally.
 
 ---
 
+## 8. Branch cleanup (after PR #4 merges)
+
+Once PR #4 is merged into `main`:
+
+1. **Delete the PR branch** (`copilot/jgtolentino-odoo19-clean-baseline`) — it
+   will be auto-deleted if "Automatically delete head branches" is on.
+2. **Close PR #3** (if still open) — it is superseded by PR #4. Add a comment:
+   > Superseded by PR #4 which includes CI, CODEOWNERS, HARDENING runbook, and
+   > TARGET_ARCHITECTURE.
+3. **Delete `copilot/create-clean-odoo-19-baseline`** — the old branch is no
+   longer needed once PR #4 is on `main`.
+
+After cleanup, only `main` should remain.
+
+---
+
+## Locked end state
+
+After these steps, `odoo19-clean` is treated as:
+
+- **Frozen clean-room baseline** — Phase 0 only on `main`
+- **Protected reference repo** — no direct pushes, no force pushes
+- **No feature growth beyond baseline maintenance**
+- **No Databricks / Genie / platform / custom business scope**
+
+### Next repo
+
+Do **not** extend `odoo19-clean` further.
+
+The next real build-out belongs in **`insightpulseai/odoo`** (Azure DevOps),
+with `odoo19-clean` used only as the reference baseline.
+
+---
+
 ## Assumptions and deferred items
 
 | Item | Status |
@@ -154,4 +193,5 @@ separate Phase 1 branch, after all Phase 0 acceptance criteria pass locally.
 | Docker runtime local validation | Deferred — requires Docker on a dev machine |
 | `/web/health` smoke test in CI | Deferred — would need a running stack (integration CI, not unit) |
 | Dependabot for `actions/checkout` pin | Can be added; deferred pending org policy |
-| Signed commits requirement | Optional; deferred |
+| Signed commits (web-based) | Apply in `Settings → General` → Require contributors to sign off on web-based commits |
+| CodeQL as required check | Add after code scanning workflow runs successfully once on `main` |

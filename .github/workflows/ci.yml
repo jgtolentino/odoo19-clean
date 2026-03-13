@@ -196,6 +196,8 @@ jobs:
             "scripts/init_db.sh"
             "scripts/init_demo_db.sh"
             "docs/BASELINE.md"
+            "docs/HARDENING.md"
+            "docs/architecture/TARGET_ARCHITECTURE.md"
             "spec/clean-odoo/constitution.md"
             "spec/clean-odoo/prd.md"
             "spec/clean-odoo/plan.md"

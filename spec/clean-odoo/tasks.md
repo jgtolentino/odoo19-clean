@@ -62,8 +62,16 @@ Steps to complete after PR #4 is merged into `main`. See `docs/HARDENING.md` for
   - [ ] `scope-guard`
   - [ ] `db-name-check`
   - [ ] `required-files`
+  - [ ] `CodeQL` (add only if code scanning is consistently present on `main`)
 - [ ] Verify `main` shows lock icon in `Settings → Branches`
 - [ ] Verify direct push to `main` is rejected
+
+## Branch cleanup (after PR #4 merges)
+
+- [ ] Delete `copilot/jgtolentino-odoo19-clean-baseline` (auto-deleted if "Automatically delete head branches" is on)
+- [ ] Close PR #3 if still open — add comment: "Superseded by PR #4"
+- [ ] Delete `copilot/create-clean-odoo-19-baseline` if it still exists
+- [ ] Confirm only `main` remains in `Settings → Branches`
 
 ## Sign-off
 
@@ -71,4 +79,17 @@ Steps to complete after PR #4 is merged into `main`. See `docs/HARDENING.md` for
 - [ ] No custom addons, OCA paths, or IPAI references present
 - [ ] No MCP config (`.mcp.json`) or MCP docs present
 - [ ] Repo is PR-ready and reviewable
+
+## Locked end state
+
+After all hardening and cleanup steps above are complete, this repo is:
+
+- **Frozen clean-room baseline** — Phase 0 only on `main`
+- **Protected reference repo** — no direct pushes, no force pushes
+- **No feature growth beyond baseline maintenance**
+- **No Databricks / Genie / platform / custom business scope**
+
+**Next repo:** Do not extend `odoo19-clean` further.  
+The next build-out belongs in `insightpulseai/odoo` (Azure DevOps),  
+with `odoo19-clean` used only as the reference baseline.
 

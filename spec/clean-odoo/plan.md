@@ -1,5 +1,11 @@
 # Plan — clean-odoo
 
+> **Desired end state:** `docs/architecture/TARGET_ARCHITECTURE.md`  
+> **GitHub Settings runbook:** `docs/HARDENING.md`  
+> **Implementation checklist:** `spec/clean-odoo/tasks.md`
+>
+> All authoritative documentation lives in-repo. The GitHub wiki is disabled.
+
 ## Phase 0 — Core-only runtime (this repo, `main`)
 
 - Use the official `odoo:19` Docker image unmodified.

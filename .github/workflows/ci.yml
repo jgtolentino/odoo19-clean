@@ -1,0 +1,222 @@
+name: Baseline CI
+
+# Runs on every push and pull request.
+# Purpose: keep the clean-room baseline stable and enforce boundary rules.
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+# Minimal read-only permissions for all jobs. No write access is needed.
+permissions:
+  contents: read
+
+jobs:
+  # --------------------------------------------------------------------------
+  # 1. Shell script lint
+  #    Ensure all helper scripts are syntactically correct.
+  # --------------------------------------------------------------------------
+  shell-lint:
+    name: Shell lint (shellcheck)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install shellcheck
+        run: sudo apt-get install -y shellcheck
+
+      - name: Lint scripts/
+        run: shellcheck scripts/*.sh
+
+  # --------------------------------------------------------------------------
+  # 2. Scope-creep guard
+  #    Reject any commit that introduces forbidden patterns:
+  #      - ipai_* modules or directories
+  #      - OCA bulk-import paths (addons/oca/)
+  #      - Databricks or Spark artefacts
+  #      - Genie / Power BI content
+  #      - Azure / platform IaC (Terraform, Bicep, ARM)
+  #      - MCP config files (.mcp.json)
+  # --------------------------------------------------------------------------
+  scope-guard:
+    name: Scope-creep guard
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for forbidden paths / patterns
+        run: |
+          FAILED=0
+
+          # Forbidden directory names (anywhere in tree)
+          forbidden_dirs=(
+            "databricks"
+            "genie"
+            "powerbi"
+            "power_bi"
+            "terraform"
+            "bicep"
+          )
+
+          for dir in "${forbidden_dirs[@]}"; do
+            if find . -not -path './.git/*' -type d -iname "${dir}" | grep -q .; then
+              echo "FAIL: Forbidden directory detected: '${dir}'"
+              find . -not -path './.git/*' -type d -iname "${dir}"
+              FAILED=1
+            fi
+          done
+
+          # Forbidden file names
+          if find . -not -path './.git/*' -name ".mcp.json" | grep -q .; then
+            echo "FAIL: .mcp.json (MCP config) is forbidden in this repo"
+            find . -not -path './.git/*' -name ".mcp.json"
+            FAILED=1
+          fi
+
+          # Forbidden addon paths (addons/oca, addons/ipai, addons/local)
+          for addon_path in "addons/oca" "addons/ipai" "addons/local"; do
+            if find . -not -path './.git/*' -type d -iwholename "*/${addon_path}" | grep -q .; then
+              echo "FAIL: Forbidden addon path '${addon_path}' detected"
+              find . -not -path './.git/*' -type d -iwholename "*/${addon_path}"
+              FAILED=1
+            fi
+          done
+
+          # Reject ipai_* module files anywhere in the tree
+          if find . -not -path './.git/*' -name "ipai_*" | grep -q .; then
+            echo "FAIL: ipai_* module files are forbidden in this repo"
+            find . -not -path './.git/*' -name "ipai_*"
+            FAILED=1
+          fi
+
+          if [ "${FAILED}" -ne 0 ]; then
+            echo ""
+            echo "This repo is a frozen clean-room baseline (odoo19-clean)."
+            echo "No OCA, IPAI, Databricks, Genie/BI, or platform IaC is allowed here."
+            echo "See docs/BASELINE.md for the boundary rules."
+            exit 1
+          fi
+
+          echo "OK: No forbidden scope creep detected."
+
+  # --------------------------------------------------------------------------
+  # 3. Canonical DB name check
+  #    Ensure only the four allowed database names appear in config and scripts.
+  # --------------------------------------------------------------------------
+  db-name-check:
+    name: Canonical DB name check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify only canonical DB names are used
+        run: |
+          FAILED=0
+          ALLOWED_PATTERN="^(odoo_dev|odoo_dev_demo|odoo_staging|odoo)$"
+
+          # Extract --database <name> values from shell scripts.
+          # Skip lines using shell variable expansion (e.g. "${DB_NAME}") —
+          # those variables are validated by reading the assignment lines below.
+          if [ ! -d "scripts" ]; then
+            echo "FAIL: 'scripts/' directory is missing — baseline skeleton is broken"
+            exit 1
+          fi
+          while IFS= read -r line; do
+            db=$(echo "${line}" | sed -n 's/.*--database[[:space:]]\+\([^[:space:]]*\).*/\1/p')
+            # Skip empty results and shell variable references
+            if [ -z "${db}" ] || echo "${db}" | grep -q '\$'; then
+              continue
+            fi
+            if ! echo "${db}" | grep -qE "${ALLOWED_PATTERN}"; then
+              echo "FAIL: Non-canonical DB name '${db}' in: ${line}"
+              FAILED=1
+            fi
+          done < <(grep -rn --include="*.sh" -- '--database' scripts/)
+
+          # Validate literal DB name variable assignments in shell scripts.
+          # Matches lines like: DB_NAME=odoo_dev or DEMO_DB_NAME=odoo_dev_demo
+          while IFS= read -r line; do
+            db=$(echo "${line}" | sed -n 's/^[[:space:]]*[A-Z_]*DB[_NAME]*=\(.*\)/\1/p' | tr -d '"' | tr -d "'" | tr -d ' ')
+            if [ -z "${db}" ] || echo "${db}" | grep -q '\$'; then
+              continue
+            fi
+            if ! echo "${db}" | grep -qE "${ALLOWED_PATTERN}"; then
+              echo "FAIL: Non-canonical DB name '${db}' assigned in: ${line}"
+              FAILED=1
+            fi
+          done < <(grep -rn --include="*.sh" -E '^[[:space:]]*[A-Z_]*DB[_NAME]*=' scripts/)
+
+          # Extract database = <value> from .conf files
+          if [ ! -d "config" ]; then
+            echo "FAIL: 'config/' directory is missing — baseline skeleton is broken"
+            exit 1
+          fi
+          while IFS= read -r line; do
+            db=$(echo "${line}" | sed -n 's/^[[:space:]]*database[[:space:]]*=[[:space:]]*\([^[:space:]]*\).*/\1/p')
+            if [ -z "${db}" ] || echo "${db}" | grep -q '\$'; then
+              continue
+            fi
+            if ! echo "${db}" | grep -qE "${ALLOWED_PATTERN}"; then
+              echo "FAIL: Non-canonical DB name '${db}' in conf: ${line}"
+              FAILED=1
+            fi
+          done < <(grep -rn --include="*.conf" -E '^[[:space:]]*database[[:space:]]*=' config/)
+
+          if [ "${FAILED}" -ne 0 ]; then
+            echo ""
+            echo "Canonical DB names are: odoo_dev, odoo_dev_demo, odoo_staging, odoo"
+            echo "See README.md for the canonical database model."
+            exit 1
+          fi
+
+          echo "OK: All DB name references are canonical."
+
+  # --------------------------------------------------------------------------
+  # 4. Required-files check
+  #    Ensure the baseline skeleton remains intact.
+  # --------------------------------------------------------------------------
+  required-files:
+    name: Required baseline files
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check required files exist
+        run: |
+          FAILED=0
+          required=(
+            "docker/Dockerfile.clean"
+            "config/clean/odoo.conf"
+            "docker-compose.yml"
+            "requirements.txt"
+            "scripts/up.sh"
+            "scripts/down.sh"
+            "scripts/init_db.sh"
+            "scripts/init_demo_db.sh"
+            "docs/BASELINE.md"
+            "docs/HARDENING.md"
+            "docs/architecture/TARGET_ARCHITECTURE.md"
+            "spec/clean-odoo/constitution.md"
+            "spec/clean-odoo/prd.md"
+            "spec/clean-odoo/plan.md"
+            "spec/clean-odoo/tasks.md"
+            ".env.example"
+          )
+
+          for f in "${required[@]}"; do
+            if [ ! -f "${f}" ]; then
+              echo "FAIL: Required baseline file missing: ${f}"
+              FAILED=1
+            fi
+          done
+
+          if [ "${FAILED}" -ne 0 ]; then
+            echo ""
+            echo "The baseline skeleton must remain intact."
+            echo "See docs/BASELINE.md for the full list of required files."
+            exit 1
+          fi
+
+          echo "OK: All required baseline files are present."

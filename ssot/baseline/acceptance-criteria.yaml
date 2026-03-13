@@ -1,0 +1,58 @@
+---
+schema_version: "1.0"
+repo: jgtolentino/odoo19-clean
+phase: "0"
+title: Phase 0 Acceptance Criteria
+
+criteria:
+  - id: stack_boots
+    description: "Docker stack starts cleanly"
+    how: "docker compose ps shows both db and odoo services running"
+    command: "docker compose ps"
+    expected: "both db and odoo are in state Up/running"
+
+  - id: odoo_dev_initializes
+    description: "odoo_dev database initializes without errors"
+    how: "bash scripts/init_db.sh exits 0; base module only, no demo data"
+    command: "bash scripts/init_db.sh"
+    expected: "exit code 0, no ERROR lines in output"
+    db: "odoo_dev"
+    demo_data: false
+    addon_scope: "base"
+
+  - id: odoo_dev_demo_initializes
+    description: "odoo_dev_demo database initializes without errors"
+    how: "bash scripts/init_demo_db.sh exits 0; broad core apps, demo data enabled"
+    command: "bash scripts/init_demo_db.sh"
+    expected: "exit code 0, no ERROR lines in output"
+    db: "odoo_dev_demo"
+    demo_data: true
+    addon_scope: "broad_core_apps"
+
+  - id: web_login_responds
+    description: "/web/login returns HTTP 200"
+    how: "curl http://localhost:8069/web/login returns 200"
+    command: "curl -o /dev/null -sw '%{http_code}' http://localhost:8069/web/login"
+    expected: "200"
+
+  - id: health_endpoint_responds
+    description: "/web/health returns {\"status\":\"pass\"}"
+    how: "curl http://localhost:8069/web/health"
+    command: "curl -sf http://localhost:8069/web/health"
+    expected: "{\"status\":\"pass\"}"
+
+  - id: no_custom_addon_drift
+    description: "No __manifest__.py or addons/ directory exists"
+    how: "find . -name __manifest__.py returns empty; find . -type d -name addons returns empty"
+    command: "bash scripts/ci/check_scope_boundaries.sh ."
+    expected: "exit code 0"
+
+  - id: dbs_remain_separate
+    description: "odoo_dev and odoo_dev_demo are independent databases"
+    how: "Both databases exist and are separate (not aliases)"
+    expected: "two distinct databases under the postgres service"
+
+failure_doctrine:
+  baseline_red_and_runtime_red: "platform or core Odoo issue — not a custom-layer problem"
+  baseline_green_and_runtime_red: "custom-layer drift in Insightpulseai/odoo — isolate custom addons"
+  baseline_red_only: "regression in the clean baseline — investigate Odoo 19 core or Docker config"

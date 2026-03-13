@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0",
+  "repo_role": "clean_control_specimen",
+  "repo": "jgtolentino/odoo19-clean",
+  "canonical_runtime_repo": "Insightpulseai/odoo",
+  "description": "Frozen clean-room Odoo 19 baseline. Regression comparator and clean-start validator only. Not a delivery or runtime repo.",
+  "allowed_db_names": [
+    "odoo_dev",
+    "odoo_dev_demo",
+    "odoo_staging",
+    "odoo"
+  ],
+  "forbidden_capabilities": [
+    "oca_addons",
+    "ipai_addons",
+    "external_integrations",
+    "product_features",
+    "custom_addon_drift",
+    "runtime_infra",
+    "platform_iac"
+  ],
+  "frozen": true,
+  "baseline_tag": "baseline-v1",
+  "purpose": [
+    "regression_comparison",
+    "clean_start_validation",
+    "odoo_sh_alignment_specimen",
+    "platform_vs_custom_drift_isolation"
+  ],
+  "must_not": [
+    "receive_feature_work",
+    "host_oca_or_ipai_addons",
+    "contain_external_integration_config",
+    "contain_runtime_or_infra_concerns",
+    "be_migrated_into_canonical_runtime_repo"
+  ]
+}

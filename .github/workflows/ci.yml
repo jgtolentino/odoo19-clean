@@ -50,8 +50,15 @@ jobs:
         run: |
           FAILED=0
 
-          # Forbidden directory names (anywhere in tree)
+          # Forbidden directory names (anywhere in tree, case-insensitive)
           forbidden_dirs=(
+            "addons"
+            "supabase"
+            "apps"
+            "packages"
+            "runtime"
+            "n8n"
+            "mcp"
             "databricks"
             "genie"
             "powerbi"
@@ -75,15 +82,6 @@ jobs:
             FAILED=1
           fi
 
-          # Forbidden addon paths (addons/oca, addons/ipai, addons/local)
-          for addon_path in "addons/oca" "addons/ipai" "addons/local"; do
-            if find . -not -path './.git/*' -type d -iwholename "*/${addon_path}" | grep -q .; then
-              echo "FAIL: Forbidden addon path '${addon_path}' detected"
-              find . -not -path './.git/*' -type d -iwholename "*/${addon_path}"
-              FAILED=1
-            fi
-          done
-
           # Reject ipai_* module files anywhere in the tree
           if find . -not -path './.git/*' -name "ipai_*" | grep -q .; then
             echo "FAIL: ipai_* module files are forbidden in this repo"
@@ -91,11 +89,35 @@ jobs:
             FAILED=1
           fi
 
+          # Reject Odoo addon manifests — no custom addons allowed
+          if find . -not -path './.git/*' -name "__manifest__.py" | grep -q .; then
+            echo "FAIL: __manifest__.py detected — custom Odoo addons are forbidden in this repo"
+            find . -not -path './.git/*' -name "__manifest__.py"
+            FAILED=1
+          fi
+
+          # Top-level directory allowlist
+          allowed_top_level=("config" "docker" "docs" "scripts" "spec" "ssot" ".github")
+          while IFS= read -r d; do
+            basename_d=$(basename "${d}")
+            allowed=0
+            for allowed_dir in "${allowed_top_level[@]}"; do
+              if [ "${basename_d}" = "${allowed_dir}" ]; then
+                allowed=1
+                break
+              fi
+            done
+            if [ "${allowed}" -eq 0 ]; then
+              echo "FAIL: Non-approved top-level directory: '${basename_d}'"
+              FAILED=1
+            fi
+          done < <(find . -mindepth 1 -maxdepth 1 -not -path './.git' -type d)
+
           if [ "${FAILED}" -ne 0 ]; then
             echo ""
             echo "This repo is a frozen clean-room baseline (odoo19-clean)."
-            echo "No OCA, IPAI, Databricks, Genie/BI, or platform IaC is allowed here."
-            echo "See docs/BASELINE.md for the boundary rules."
+            echo "No OCA, IPAI, Databricks, Genie/BI, platform IaC, or custom addons are allowed here."
+            echo "See docs/SCOPE_BOUNDARY.md for the full boundary rules."
             exit 1
           fi
 
@@ -197,11 +219,15 @@ jobs:
             "scripts/init_demo_db.sh"
             "docs/BASELINE.md"
             "docs/HARDENING.md"
+            "docs/SCOPE_BOUNDARY.md"
             "docs/architecture/TARGET_ARCHITECTURE.md"
             "spec/clean-odoo/constitution.md"
             "spec/clean-odoo/prd.md"
             "spec/clean-odoo/plan.md"
             "spec/clean-odoo/tasks.md"
+            "ssot/baseline/baseline.manifest.json"
+            "ssot/baseline/scope-policy.yaml"
+            "ssot/baseline/acceptance-criteria.yaml"
             ".env.example"
             "scripts/ci/check_repo_settings.sh"
             "scripts/ci/check_scope_boundaries.sh"

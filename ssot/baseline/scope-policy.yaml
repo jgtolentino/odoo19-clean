@@ -1,0 +1,66 @@
+---
+schema_version: "1.0"
+repo: jgtolentino/odoo19-clean
+policy: frozen_clean_room_baseline
+
+# Exhaustive list of top-level directories and files allowed in this repo.
+# Any entry outside this list causes CI to fail.
+allowed_top_level:
+  dirs:
+    - config
+    - docker
+    - docs
+    - scripts
+    - spec
+    - ssot
+    - .github
+  files:
+    - README.md
+    - docker-compose.yml
+    - requirements.txt
+    - .env.example
+    - .gitignore
+
+# Top-level directories that are permanently forbidden.
+# These represent delivery/runtime/integration concerns that must never
+# appear in the baseline control specimen.
+forbidden_top_level_dirs:
+  - addons
+  - supabase
+  - apps
+  - packages
+  - runtime
+  - n8n
+  - mcp
+  - databricks
+  - genie
+  - powerbi
+  - power_bi
+  - terraform
+  - bicep
+
+# File patterns forbidden anywhere in the tree.
+forbidden_file_patterns:
+  - "__manifest__.py"    # Odoo addon manifests — no custom addons allowed
+  - "ipai_*"            # IPAI module files
+  - ".mcp.json"         # MCP config files
+  - "*.tf"              # Terraform IaC
+  - "*.bicep"           # Bicep IaC
+
+# Forbidden directory names anywhere in the tree (case-insensitive).
+forbidden_dirs_anywhere:
+  - addons
+  - databricks
+  - genie
+  - powerbi
+  - power_bi
+  - terraform
+  - bicep
+  - supabase
+  - n8n
+  - mcp
+
+rationale: >
+  This repo is a frozen clean-room control specimen. Its scope is intentionally
+  minimal. Any file or directory outside the allowlist indicates scope creep and
+  must be rejected by CI. See docs/SCOPE_BOUNDARY.md for full doctrine.

@@ -13,6 +13,13 @@ echo "---"
 
 # Banned directories (anywhere in tree, case-insensitive)
 BANNED_DIRS=(
+  "addons"
+  "supabase"
+  "apps"
+  "packages"
+  "runtime"
+  "n8n"
+  "mcp"
   "databricks"
   "genie"
   "powerbi"
@@ -25,20 +32,6 @@ for dir in "${BANNED_DIRS[@]}"; do
   if find "${REPO_ROOT}" -not -path '*/.git/*' -type d -iname "${dir}" 2>/dev/null | grep -q .; then
     fail "Forbidden directory: '${dir}'"
     find "${REPO_ROOT}" -not -path '*/.git/*' -type d -iname "${dir}"
-  fi
-done
-
-# Banned addon paths
-BANNED_ADDON_PATHS=(
-  "addons/oca"
-  "addons/ipai"
-  "addons/local"
-)
-
-for addon_path in "${BANNED_ADDON_PATHS[@]}"; do
-  if find "${REPO_ROOT}" -not -path '*/.git/*' -type d -iwholename "*/${addon_path}" 2>/dev/null | grep -q .; then
-    fail "Forbidden addon path: '${addon_path}'"
-    find "${REPO_ROOT}" -not -path '*/.git/*' -type d -iwholename "*/${addon_path}"
   fi
 done
 
@@ -60,12 +53,34 @@ if find "${REPO_ROOT}" -not -path '*/.git/*' -name "ipai_*" 2>/dev/null | grep -
   find "${REPO_ROOT}" -not -path '*/.git/*' -name "ipai_*"
 fi
 
+# Odoo addon manifests (__manifest__.py) — no custom addons allowed
+if find "${REPO_ROOT}" -not -path '*/.git/*' -name "__manifest__.py" 2>/dev/null | grep -q .; then
+  fail "__manifest__.py detected — custom Odoo addons are forbidden in this repo"
+  find "${REPO_ROOT}" -not -path '*/.git/*' -name "__manifest__.py"
+fi
+
+# Top-level directory allowlist — reject anything outside the approved set
+ALLOWED_TOP_LEVEL_DIRS=("config" "docker" "docs" "scripts" "spec" "ssot" ".github")
+while IFS= read -r d; do
+  basename_d=$(basename "${d}")
+  allowed=0
+  for allowed_dir in "${ALLOWED_TOP_LEVEL_DIRS[@]}"; do
+    if [ "${basename_d}" = "${allowed_dir}" ]; then
+      allowed=1
+      break
+    fi
+  done
+  if [ "${allowed}" -eq 0 ]; then
+    fail "Non-approved top-level directory: '${basename_d}' — not in allowlist"
+  fi
+done < <(find "${REPO_ROOT}" -mindepth 1 -maxdepth 1 -not -path '*/.git' -type d 2>/dev/null)
+
 echo "---"
 if [ "${FAILED}" -ne 0 ]; then
   echo ""
   echo "This repo is a frozen clean-room baseline (odoo19-clean)."
-  echo "No OCA, IPAI, Databricks, Genie/BI, or platform IaC is allowed here."
-  echo "See docs/BASELINE.md for the boundary rules."
+  echo "No OCA, IPAI, Databricks, Genie/BI, platform IaC, or custom addons are allowed here."
+  echo "See docs/SCOPE_BOUNDARY.md for the full boundary rules."
   exit 1
 fi
 

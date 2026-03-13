@@ -104,3 +104,16 @@ Potential future benchmark phases (not active in this repo by default):
 
 This repo remains a control specimen. No addon drift until Phase 1 is explicitly started on its own branch.
 
+## Machine-readable baseline contract
+
+The `ssot/baseline/` directory contains machine-readable metadata that defines the scope and role of this repo:
+
+| File | Purpose |
+|---|---|
+| [`ssot/baseline/baseline.manifest.json`](ssot/baseline/baseline.manifest.json) | Repo role, canonical runtime repo reference, allowed DB names, forbidden capabilities |
+| [`ssot/baseline/scope-policy.yaml`](ssot/baseline/scope-policy.yaml) | Top-level allowlist, forbidden dirs/files anywhere in tree |
+| [`ssot/baseline/acceptance-criteria.yaml`](ssot/baseline/acceptance-criteria.yaml) | Machine-readable Phase 0 acceptance tests and drift interpretation doctrine |
+
+These files are consumed by CI and provide a stable anchor for cross-repo tooling.  
+See [`docs/SCOPE_BOUNDARY.md`](docs/SCOPE_BOUNDARY.md) for the human-readable version.
+

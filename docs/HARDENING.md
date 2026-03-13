@@ -21,7 +21,37 @@ PR #4 adds `.github/workflows/ci.yml` with four enforcement jobs:
 
 ---
 
-## 2. Actions approval policy
+## 2. GitHub repository General settings
+
+**Where:** `Settings → General`
+
+Apply these settings before or immediately after merging PR #4.
+
+| Setting | Value |
+|---|---|
+| Template repository | Off |
+| Wikis | **Off** — all docs are versioned in-repo; a wiki creates a second undisciplined documentation surface that will drift |
+| Issues | On |
+| Discussions | Off |
+| Projects | Off |
+| Sponsorships | Off |
+| Allow merge commits | **Off** — squash-only history |
+| Allow squash merging | **On** |
+| Allow rebase merging | **Off** |
+| Always suggest updating branches | On |
+| Allow auto-merge | Off |
+| Automatically delete head branches | **On** — keeps branch list clean |
+| Require contributors to sign off on web-based commits | On |
+
+> **Why wikis off?** This repo is a frozen clean-room baseline. All authoritative
+> documentation must live in `README.md`, `docs/`, and `spec/` — versioned
+> alongside code and CI. A GitHub wiki is a separate surface not tracked by
+> `git`, not validated by CI, and not subject to CODEOWNERS review. It will
+> drift. Disable it.
+
+---
+
+## 3. Actions approval policy
 
 **Where:** `Settings → Actions → General → Fork pull request workflows`
 
@@ -34,7 +64,7 @@ approves them. It is the correct setting for a personal public repo.
 
 ---
 
-## 3. Branch protection ruleset for `main`
+## 4. Branch protection ruleset for `main`
 
 **Where:** `Settings → Branches → Add branch ruleset` (or classic rule on `main`)
 
@@ -69,7 +99,7 @@ then add the checks.
 
 ---
 
-## 4. CODEOWNERS enforcement
+## 5. CODEOWNERS enforcement
 
 `.github/CODEOWNERS` (added in this PR) maps all files to `@jgtolentino`.
 
@@ -81,7 +111,7 @@ before merge, regardless of who opened the PR.
 
 ---
 
-## 5. Verify the protection is active
+## 6. Verify the protection is active
 
 After applying the settings above:
 
@@ -98,7 +128,7 @@ After applying the settings above:
 
 ---
 
-## 6. Desired end state
+## 7. Desired end state
 
 After completing this runbook, `odoo19-clean` has:
 

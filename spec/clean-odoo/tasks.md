@@ -34,6 +34,19 @@
 
 Steps to complete after PR #4 is merged into `main`. See `docs/HARDENING.md` for the full runbook.
 
+- [ ] **GitHub General settings** (`Settings → General`):
+  - [ ] Wikis: **Off**
+  - [ ] Issues: On
+  - [ ] Discussions: Off
+  - [ ] Projects: Off
+  - [ ] Template repository: Off
+  - [ ] Allow merge commits: **Off**
+  - [ ] Allow squash merging: **On**
+  - [ ] Allow rebase merging: **Off**
+  - [ ] Always suggest updating branches: On
+  - [ ] Allow auto-merge: Off
+  - [ ] Automatically delete head branches: **On**
+  - [ ] Require contributors to sign off on web-based commits: On
 - [ ] Set Actions approval policy: **Require approval for all outside collaborators** (`Settings → Actions → General`)
 - [ ] Add branch protection ruleset for `main`:
   - [ ] Require pull request before merging

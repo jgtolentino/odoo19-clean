@@ -2,14 +2,25 @@
 
 **Clean-room Odoo 19 baseline repository.**
 
-## Purpose
+## What this repo is
 
-This repo exists as a clean-slate control specimen for Odoo 19:
+A **frozen clean-room control specimen** for Odoo 19.  
+Its sole purpose: verify that a vanilla Odoo 19 stack starts, initialises a
+database, and serves the web UI correctly — with no custom addons, no
+integrations, and no scope creep.
 
-- **Phase 0 — no custom addons.** Only the Odoo 19 core image is used.
-- Validates that a clean Docker runtime can start and respond.
-- Validates that a fresh database can be initialised with the `base` module.
-- Provides a stable, reproducible starting point for future controlled layering (OCA baseline, IPAI addons, etc.) without noise from prior environments.
+All future addon layering (OCA modules, IPAI integrations, custom apps) must
+be benchmarked against this baseline.
+
+## What this repo is not
+
+- ❌ The real Odoo runtime repo
+- ❌ An OCA or IPAI addon host
+- ❌ A wiki — all docs live in-repo, versioned alongside CI
+- ❌ A Slack integration hub — belongs on active delivery repos
+- ❌ A template repository
+
+For the full desired end state, see [`docs/architecture/TARGET_ARCHITECTURE.md`](docs/architecture/TARGET_ARCHITECTURE.md).
 
 ## Canonical database model
 
@@ -25,19 +36,20 @@ This repo exists as a clean-slate control specimen for Odoo 19:
 ## Repository layout
 
 ```
-docker/Dockerfile.clean      # Odoo 19 image, clean config only
-config/clean/odoo.conf       # Minimal Odoo configuration
-docker-compose.yml           # db + odoo services, no custom mounts
-requirements.txt             # Python deps (Odoo.sh-style; empty in phase 0)
-scripts/up.sh                # Start the stack
-scripts/down.sh              # Stop the stack
-scripts/init_db.sh           # Initialise odoo_dev (clean control DB)
-scripts/init_demo_db.sh      # Initialise odoo_dev_demo (showroom DB)
-docs/BASELINE.md             # Phase 0 rules and acceptance criteria
-docs/HARDENING.md            # Branch-protection runbook for main
-spec/clean-odoo/             # Constitution, PRD, plan, tasks
-.github/CODEOWNERS           # Requires @jgtolentino review on all PRs
-.github/workflows/ci.yml     # Baseline CI: shell-lint, scope-guard, db-name-check, required-files
+docker/Dockerfile.clean              # Odoo 19 image, clean config only
+config/clean/odoo.conf               # Minimal Odoo configuration
+docker-compose.yml                   # db + odoo services, no custom mounts
+requirements.txt                     # Python deps (Odoo.sh-style; empty in phase 0)
+scripts/up.sh                        # Start the stack
+scripts/down.sh                      # Stop the stack
+scripts/init_db.sh                   # Initialise odoo_dev (clean control DB)
+scripts/init_demo_db.sh              # Initialise odoo_dev_demo (showroom DB)
+docs/BASELINE.md                     # Phase 0 rules and acceptance criteria
+docs/HARDENING.md                    # Branch-protection and GitHub Settings runbook
+docs/architecture/TARGET_ARCHITECTURE.md  # Desired end state (this repo only)
+spec/clean-odoo/                     # Constitution, PRD, plan, tasks
+.github/CODEOWNERS                   # Requires @jgtolentino review on all PRs
+.github/workflows/ci.yml             # CI: shell-lint, scope-guard, db-name-check, required-files
 ```
 
 ## Quickstart — clean control DB (`odoo_dev`)

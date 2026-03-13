@@ -1,0 +1,41 @@
+name: Repo Settings Audit
+
+on:
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+  schedule:
+    - cron: "0 6 * * 1"  # Weekly Monday 06:00 UTC
+
+permissions:
+  contents: read
+
+jobs:
+  # --------------------------------------------------------------------------
+  # 1. Repo settings drift check
+  #    Verify GitHub repo settings match frozen-baseline policy via API.
+  #    Requires GITHUB_TOKEN with repo read access (default for Actions).
+  # --------------------------------------------------------------------------
+  settings-audit:
+    name: Repo settings audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify repo settings match baseline policy
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash scripts/ci/check_repo_settings.sh
+
+  # --------------------------------------------------------------------------
+  # 2. Scope boundary check (standalone)
+  #    Redundant with ci.yml scope-guard but runs on schedule too.
+  # --------------------------------------------------------------------------
+  scope-boundaries:
+    name: Scope boundary check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify no banned paths or files
+        run: bash scripts/ci/check_scope_boundaries.sh .

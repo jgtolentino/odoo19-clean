@@ -2,6 +2,8 @@
 
 **Clean-room Odoo 19 baseline repository.**
 
+> This repository is intentionally not the canonical delivery/runtime repo and must remain baseline-only.
+
 ## What this repo is
 
 A **frozen clean-room control specimen** for Odoo 19.  
@@ -48,7 +50,7 @@ docs/BASELINE.md                     # Phase 0 rules and acceptance criteria
 docs/HARDENING.md                    # Branch-protection and GitHub Settings runbook
 docs/architecture/TARGET_ARCHITECTURE.md  # Desired end state (this repo only)
 spec/clean-odoo/                     # Constitution, PRD, plan, tasks
-.github/CODEOWNERS                   # Requires @jgtolentino review on all PRs
+.github/CODEOWNERS                   # Ownership file for review routing and change visibility
 .github/workflows/ci.yml             # CI: shell-lint, scope-guard, db-name-check, required-files
 ```
 
@@ -95,10 +97,10 @@ bash scripts/down.sh
 
 ## What comes next
 
-Only after both databases are locally validated:
+Potential future benchmark phases (not active in this repo by default):
 
-1. **Phase 1** — add `queue_job` and `auditlog` (OCA); nothing else until stable
-2. **Phase 2** — IPAI addon layer
+1. **Phase 1** — benchmark `queue_job` and `auditlog` on an explicit branch
+2. **Phase 2** — benchmark IPAI addon layer only after Phase 1 is proven stable
 
 This repo remains a control specimen. No addon drift until Phase 1 is explicitly started on its own branch.
 

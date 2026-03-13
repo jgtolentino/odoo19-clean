@@ -13,6 +13,14 @@
 - [x] Create `spec/clean-odoo/` documents
 - [x] Add `requirements.txt` at repo root (Odoo.sh-style Python dep declaration)
 
+## CI / boundary enforcement
+
+- [x] Create `.github/workflows/ci.yml` with four jobs:
+  - `shell-lint` — shellcheck on all `scripts/*.sh`
+  - `scope-guard` — reject forbidden paths/patterns (ipai_*, OCA, Databricks, Genie/BI, platform IaC, MCP)
+  - `db-name-check` — verify only canonical DB names appear in config/scripts/compose
+  - `required-files` — assert baseline skeleton is intact on every PR
+
 ## Runtime validation
 
 - [ ] Run `bash scripts/up.sh` — both containers reach healthy state

@@ -34,7 +34,10 @@ scripts/down.sh              # Stop the stack
 scripts/init_db.sh           # Initialise odoo_dev (clean control DB)
 scripts/init_demo_db.sh      # Initialise odoo_dev_demo (showroom DB)
 docs/BASELINE.md             # Phase 0 rules and acceptance criteria
+docs/HARDENING.md            # Branch-protection runbook for main
 spec/clean-odoo/             # Constitution, PRD, plan, tasks
+.github/CODEOWNERS           # Requires @jgtolentino review on all PRs
+.github/workflows/ci.yml     # Baseline CI: shell-lint, scope-guard, db-name-check, required-files
 ```
 
 ## Quickstart — clean control DB (`odoo_dev`)

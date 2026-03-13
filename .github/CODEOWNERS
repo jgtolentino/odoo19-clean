@@ -1,0 +1,19 @@
+# CODEOWNERS — odoo19-clean
+#
+# All files require review from the repo owner before merging.
+# This file is enforced when branch protection requires a CODEOWNERS review.
+#
+# Reference: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Global fallback — every file requires @jgtolentino review
+* @jgtolentino
+
+# CI / workflow changes require explicit sign-off
+.github/ @jgtolentino
+
+# Core baseline files — any change must be reviewed
+docker/ @jgtolentino
+config/ @jgtolentino
+scripts/ @jgtolentino
+docs/ @jgtolentino
+spec/ @jgtolentino

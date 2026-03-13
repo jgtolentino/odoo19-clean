@@ -30,6 +30,28 @@
 - [ ] Confirm `GET /web/login` returns HTTP 200
 - [ ] Confirm `odoo_dev` and `odoo_dev_demo` are separate, independent databases
 
+## Repo hardening (post-merge)
+
+Steps to complete after PR #4 is merged into `main`. See `docs/HARDENING.md` for the full runbook.
+
+- [ ] Set Actions approval policy: **Require approval for all outside collaborators** (`Settings → Actions → General`)
+- [ ] Add branch protection ruleset for `main`:
+  - [ ] Require pull request before merging
+  - [ ] Required approvals: 1
+  - [ ] Dismiss stale approvals on new commits
+  - [ ] Require review from Code Owners (enforces `.github/CODEOWNERS`)
+  - [ ] Require status checks to pass before merging
+  - [ ] Require branches to be up to date before merging
+  - [ ] Block force pushes
+  - [ ] Block branch deletion
+- [ ] Add required status checks on `main` (after first successful run):
+  - [ ] `shell-lint`
+  - [ ] `scope-guard`
+  - [ ] `db-name-check`
+  - [ ] `required-files`
+- [ ] Verify `main` shows lock icon in `Settings → Branches`
+- [ ] Verify direct push to `main` is rejected
+
 ## Sign-off
 
 - [ ] All acceptance criteria in `docs/BASELINE.md` met

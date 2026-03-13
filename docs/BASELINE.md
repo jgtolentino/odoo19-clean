@@ -57,6 +57,16 @@ All future addon layering (OCA modules, IPAI integrations, custom apps) must be 
 - **Phase 2:** IPAI addon layer on top of the Phase 1 baseline.
 - Each phase gets its own branch and its own set of acceptance criteria.
 
+The next real platform build-out does **not** happen here. It belongs in:
+
+| Repo | Purpose |
+|---|---|
+| `Insightpulseai/odoo` | Canonical Odoo runtime repo |
+| `Insightpulseai/lakehouse` | Databricks / ETL / metric-view |
+| `Insightpulseai/genie-bi` | Semantic layer / Genie / BI |
+| `Insightpulseai/infra` | Infrastructure / platform IaC |
+| `Insightpulseai/ops-platform` | Ops and platform tooling |
+
 > The baseline merge is successful only when:
 > 1. `odoo_dev` is base-only and clean
 > 2. `odoo_dev_demo` is separate and demo-rich

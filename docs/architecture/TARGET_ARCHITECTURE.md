@@ -220,12 +220,19 @@ After all hardening steps in `docs/HARDENING.md` are applied, this repo is:
 - **No feature growth beyond baseline maintenance**
 - **No Databricks / Genie / platform / custom business scope**
 
-### Next repo
+### Next repos
 
 Do **not** extend `odoo19-clean` further.
 
-The next real build-out belongs in **`insightpulseai/odoo`** (Azure DevOps),
-with `odoo19-clean` used only as the reference baseline.
+The next real build-out belongs in:
+
+| Repo | Purpose |
+|---|---|
+| `Insightpulseai/odoo` | Canonical Odoo runtime repo |
+| `Insightpulseai/lakehouse` | Databricks / ETL / metric-view |
+| `Insightpulseai/genie-bi` | Semantic layer / Genie / BI |
+| `Insightpulseai/infra` | Infrastructure / platform IaC |
+| `Insightpulseai/ops-platform` | Ops and platform tooling |
 
 Phase 1 (`queue_job` + `auditlog`) and Phase 2 (IPAI addons) each get their
 own branches in this repo — but only after Phase 0 local validation passes,

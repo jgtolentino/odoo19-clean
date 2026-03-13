@@ -1,14 +1,14 @@
 # Repo Hardening Runbook — odoo19-clean
 
 This document is the exact step-by-step runbook to lock down `main` after
-the baseline CI (PR #4) is merged.  
+the baseline CI is merged.  
 Execute in order. Each step maps to a GitHub Settings screen or API call.
 
 ---
 
-## 1. Merge PR #4
+## 1. Baseline CI (already merged)
 
-PR #4 adds `.github/workflows/ci.yml` with four enforcement jobs:
+The baseline CI workflow (`.github/workflows/ci.yml`) adds four enforcement jobs:
 
 | Job | Enforces |
 |---|---|
@@ -17,7 +17,8 @@ PR #4 adds `.github/workflows/ci.yml` with four enforcement jobs:
 | `db-name-check` | Only canonical DB names in scripts/config |
 | `required-files` | Baseline skeleton files must all be present |
 
-**Before merging:** ensure the four jobs ran and passed on the PR head commit.
+**Verify:** ensure the four jobs ran and passed on the `main` HEAD commit before
+proceeding to the remaining hardening steps below.
 
 ---
 
@@ -25,7 +26,7 @@ PR #4 adds `.github/workflows/ci.yml` with four enforcement jobs:
 
 **Where:** `Settings → General`
 
-Apply these settings before or immediately after merging PR #4.
+Apply these settings after the baseline CI is on `main`.
 
 | Setting | Value |
 |---|---|
@@ -84,7 +85,7 @@ approves them. It is the correct setting for a personal public repo.
 
 ### Required status checks
 
-After PR #4 has run at least once on `main`, add these four checks:
+After the CI workflow has run at least once on `main`, add these four checks:
 
 ```
 shell-lint
@@ -96,17 +97,16 @@ required-files
 **CodeQL / code scanning:** If GitHub code scanning is consistently present on
 `main` (i.e. a CodeQL workflow has run at least once), add it as a required
 check too. If it is not yet stable on this repo, leave it non-required for now.
-Do not block the baseline merge waiting for CodeQL.
 
 **Note:** GitHub only allows selecting a check as "required" after it has
-completed successfully at least once in the repository. Run PR #4 first,
-then add the checks.
+completed successfully at least once in the repository. Ensure the CI workflow
+has run on `main` before adding the required checks.
 
 ---
 
 ## 5. CODEOWNERS enforcement
 
-`.github/CODEOWNERS` (added in this PR) maps all files to `@jgtolentino`.
+`.github/CODEOWNERS` maps all files to `@jgtolentino`.
 
 For CODEOWNERS review to be enforced, the branch protection rule
 **"Require review from Code Owners"** must be enabled (step 3 above).
@@ -152,19 +152,12 @@ separate Phase 1 branch, after all Phase 0 acceptance criteria pass locally.
 
 ---
 
-## 8. Branch cleanup (after PR #4 merges)
+## 8. Branch cleanup
 
-Once PR #4 is merged into `main`:
+Once baseline branches have been merged to `main`:
 
-1. **Delete the PR branch** (`copilot/jgtolentino-odoo19-clean-baseline`) — it
-   will be auto-deleted if "Automatically delete head branches" is on.
-2. **Close PR #3** (if still open) — it is superseded by PR #4. Add a comment:
-   > Superseded by PR #4 which includes CI, CODEOWNERS, HARDENING runbook, and
-   > TARGET_ARCHITECTURE.
-3. **Delete `copilot/create-clean-odoo-19-baseline`** — the old branch is no
-   longer needed once PR #4 is on `main`.
-
-After cleanup, only `main` should remain.
+1. **Delete merged PR branches** — they will be auto-deleted if "Automatically delete head branches" is on.
+2. **Confirm only `main` remains** in `Settings → Branches`.
 
 ---
 
@@ -177,12 +170,21 @@ After these steps, `odoo19-clean` is treated as:
 - **No feature growth beyond baseline maintenance**
 - **No Databricks / Genie / platform / custom business scope**
 
-### Next repo
+### Next repos
 
-Do **not** extend `odoo19-clean` further.
+Do **not** extend `odoo19-clean` further. The next real build-out belongs in:
 
-The next real build-out belongs in **`insightpulseai/odoo`** (Azure DevOps),
-with `odoo19-clean` used only as the reference baseline.
+| Repo | Purpose |
+|---|---|
+| `Insightpulseai/odoo` | Canonical Odoo runtime repo |
+| `Insightpulseai/lakehouse` | Databricks / ETL / metric-view |
+| `Insightpulseai/genie-bi` | Semantic layer / Genie / BI |
+| `Insightpulseai/infra` | Infrastructure / platform IaC |
+| `Insightpulseai/ops-platform` | Ops and platform tooling |
+
+`odoo19-clean` is the reference baseline only. Use it for clean Odoo 19 runtime
+sanity, DB init sanity, smoke-path validation, and future comparison against
+canonical repos.
 
 ---
 

@@ -32,7 +32,7 @@
 
 ## Repo hardening (post-merge)
 
-Steps to complete after PR #4 is merged into `main`. See `docs/HARDENING.md` for the full runbook.
+Steps to complete after the baseline CI is merged into `main`. See `docs/HARDENING.md` for the full runbook.
 
 - [ ] **GitHub General settings** (`Settings → General`):
   - [ ] Wikis: **Off**
@@ -66,11 +66,9 @@ Steps to complete after PR #4 is merged into `main`. See `docs/HARDENING.md` for
 - [ ] Verify `main` shows lock icon in `Settings → Branches`
 - [ ] Verify direct push to `main` is rejected
 
-## Branch cleanup (after PR #4 merges)
+## Branch cleanup
 
-- [ ] Delete `copilot/jgtolentino-odoo19-clean-baseline` (auto-deleted if "Automatically delete head branches" is on)
-- [ ] Close PR #3 if still open — add comment: "Superseded by PR #4"
-- [ ] Delete `copilot/create-clean-odoo-19-baseline` if it still exists
+- [ ] Delete any merged PR branches (auto-deleted if "Automatically delete head branches" is on)
 - [ ] Confirm only `main` remains in `Settings → Branches`
 
 ## Sign-off
@@ -89,7 +87,15 @@ After all hardening and cleanup steps above are complete, this repo is:
 - **No feature growth beyond baseline maintenance**
 - **No Databricks / Genie / platform / custom business scope**
 
-**Next repo:** Do not extend `odoo19-clean` further.  
-The next build-out belongs in `insightpulseai/odoo` (Azure DevOps),  
-with `odoo19-clean` used only as the reference baseline.
+**Next repos:** Do not extend `odoo19-clean` further. The next build-out belongs in:
+
+| Repo | Purpose |
+|---|---|
+| `Insightpulseai/odoo` | Canonical Odoo runtime repo |
+| `Insightpulseai/lakehouse` | Databricks / ETL / metric-view |
+| `Insightpulseai/genie-bi` | Semantic layer / Genie / BI |
+| `Insightpulseai/infra` | Infrastructure / platform IaC |
+| `Insightpulseai/ops-platform` | Ops and platform tooling |
+
+`odoo19-clean` is the reference baseline only.
 

@@ -102,3 +102,17 @@ Only after both databases are locally validated:
 
 This repo remains a control specimen. No addon drift until Phase 1 is explicitly started on its own branch.
 
+## Canonical downstream repos
+
+The next real build-out does **not** happen here. It belongs in:
+
+| Repo | Purpose |
+|---|---|
+| `Insightpulseai/odoo` | Canonical Odoo runtime repo |
+| `Insightpulseai/lakehouse` | Databricks / ETL / metric-view |
+| `Insightpulseai/genie-bi` | Semantic layer / Genie / BI |
+| `Insightpulseai/infra` | Infrastructure / platform IaC |
+| `Insightpulseai/ops-platform` | Ops and platform tooling |
+
+`odoo19-clean` is the reference baseline only. Do not extend it into the canonical runtime or platform repos.
+
